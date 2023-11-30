@@ -1,0 +1,17 @@
+// https://adventofcode.com/2023/day/__DAY__
+
+export function part1(input: string) {
+  const v = parseInput(input);
+  return '';
+}
+
+export function part2(input: string) {
+  const v = parseInput(input);
+  return '';
+}
+
+function parseInput(input: string) {
+  return input
+    .split('\n')
+    .map(row => '');
+}

@@ -1,0 +1,42 @@
+{
+  "name": "advent-of-code-2022",
+  "version": "1.0.0",
+  "description": "This is repository for my solutions for Advent of Code 2020 programming puzzles (https://adventofcode.com/2022/about).",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Voya100/advent-of-code-2022.git"
+  },
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "keywords": [
+    "nodejs",
+    "TypeScript"
+  ],
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "lint:fix": "eslint --ext .js,.ts . --fix"
+  },
+  "author": "Voya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Voya100/advent-of-code-2023/issues"
+  },
+  "homepage": "https://github.com/Voya100/advent-of-code-2023#readme",
+  "devDependencies": {
+    "@types/jest": "^29.2.3",
+    "@types/node": "^18.11.10",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jest": "^29.7.0",
+    "prettier": "^3.1.0",
+    "ts-jest": "^29.1.1"
+  },
+  "dependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  }
+}
