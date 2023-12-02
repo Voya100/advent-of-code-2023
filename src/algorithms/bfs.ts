@@ -5,11 +5,7 @@
  * @param options      Options which may be passed to node's getAdjacentNodes method
  * @returns
  */
-export function findTargetWithBfs<
-  ValueType,
-  Options,
-  NodeType extends BfsNode<ValueType, Options>
->(
+export function findTargetWithBfs<ValueType, Options, NodeType extends BfsNode<ValueType, Options>>(
   start: NodeType,
   isTargetNode: (node: NodeType) => boolean,
   options: Options
@@ -28,11 +24,7 @@ export function findTargetWithBfs<
  * @param options      Options which may be passed to node's getAdjacentNodes method
  * @returns
  */
-export function findTargetsWithBfs<
-  ValueType,
-  Options,
-  NodeType extends BfsNode<ValueType, Options>
->(
+export function findTargetsWithBfs<ValueType, Options, NodeType extends BfsNode<ValueType, Options>>(
   start: NodeType,
   isTargetNode: (node: NodeType) => boolean,
   options: Options,
@@ -96,10 +88,7 @@ export abstract class BfsNode<ValueType, Options> {
   }
 
   get startNode(): BfsNode<ValueType, Options> {
-    return (
-      (this.nodeState.previousNode && this.nodeState.previousNode.startNode) ||
-      this
-    );
+    return (this.nodeState.previousNode && this.nodeState.previousNode.startNode) || this;
   }
 
   get previousNode() {

@@ -5,9 +5,7 @@ import { exit } from 'process';
 
 async function main() {
   if (process.argv.length <= 2) {
-    console.log(
-      'Usage: ./createDay.ts [dayNumber, 1-25]\nExample: ./createDay.ts 1'
-    );
+    console.log('Usage: ./createDay.ts [dayNumber, 1-25]\nExample: ./createDay.ts 1');
     return;
   }
 
@@ -30,21 +28,14 @@ async function main() {
   ]);
 }
 
-async function writeFile(
-  templatePath: string,
-  outputPath: string,
-  day: number
-) {
+async function writeFile(templatePath: string, outputPath: string, day: number) {
   if (await fileExists(outputPath)) {
     console.error(`File ${day} already exists`);
     exit();
   }
 
   const template = await fs.readFile(templatePath, 'utf8');
-  await fs.writeFile(
-    outputPath,
-    template.replaceAll('__DAY__', day.toString())
-  );
+  await fs.writeFile(outputPath, template.replaceAll('__DAY__', day.toString()));
 }
 
 async function fileExists(path: string) {

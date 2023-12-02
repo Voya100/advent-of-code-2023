@@ -48,9 +48,7 @@ Optional arguments:
   if (dayInput === 'all' || version === 'all') {
     dayVersions = await getAllDayVersionPairs();
     if (version !== 'all') {
-      dayVersions = dayVersions.filter(
-        ([, dayVersion]) => dayVersion === version
-      );
+      dayVersions = dayVersions.filter(([, dayVersion]) => dayVersion === version);
     }
     if (dayInput !== 'all') {
       dayVersions = dayVersions.filter(([dayNumber]) => dayNumber === day);
@@ -70,9 +68,7 @@ async function getAllDayVersionPairs() {
   return allFiles
     .map((file) => file.match(/day(\d{1,2})(-)?(v\d*)?\.ts$/)!)
     .filter((match) => match)
-    .map(
-      ([, day, , version]) => [+day, version] as [number, string | undefined]
-    )
+    .map(([, day, , version]) => [+day, version] as [number, string | undefined])
     .sort(([day1, version1], [day2, version2]) => {
       if (day1 !== day2) {
         return day1 - day2;
@@ -81,11 +77,7 @@ async function getAllDayVersionPairs() {
     });
 }
 
-async function processDay(
-  day: number,
-  version: string | null | undefined,
-  testPerformance: boolean
-) {
+async function processDay(day: number, version: string | null | undefined, testPerformance: boolean) {
   let input: string;
 
   try {
@@ -96,9 +88,7 @@ async function processDay(
   }
 
   // Not most ideal from type security standpoint, but good enough for this use case
-  const module: DayScriptModule = await import(
-    `./src/day${day}${version ? '-' + version : ''}`
-  );
+  const module: DayScriptModule = await import(`./src/day${day}${version ? '-' + version : ''}`);
   const versionString = version ? ` (${version})` : '';
   console.log(`Day ${day}${versionString}`);
   processDayPart(1, module.part1, input, testPerformance);
@@ -120,10 +110,7 @@ async function processDayPart(
       partFunction(input);
     }
   }
-  const duration1 = getDuration(
-    time,
-    testPerformance ? PERFORMANCE_CHECK_ITERATIONS : 1
-  );
+  const duration1 = getDuration(time, testPerformance ? PERFORMANCE_CHECK_ITERATIONS : 1);
   const durationString = `${testPerformance ? 'average ' : ''}${duration1} ms`;
   console.log(`Part ${part}: ${result} (${durationString})`);
 }

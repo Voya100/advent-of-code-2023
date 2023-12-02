@@ -1,5 +1,8 @@
 export class HeapItem<T> {
-  constructor(public object: T, public value: number) {}
+  constructor(
+    public object: T,
+    public value: number
+  ) {}
 }
 
 export class MinHeap<T> {
@@ -35,16 +38,10 @@ export class MinHeap<T> {
     const left = 2 * index + 1;
     const right = 2 * (index + 1);
     let smallest = index;
-    if (
-      left < this.items.length &&
-      this.items[left].value < this.items[smallest].value
-    ) {
+    if (left < this.items.length && this.items[left].value < this.items[smallest].value) {
       smallest = left;
     }
-    if (
-      right < this.items.length &&
-      this.items[right].value < this.items[smallest].value
-    ) {
+    if (right < this.items.length && this.items[right].value < this.items[smallest].value) {
       smallest = right;
     }
     if (smallest !== index) {
