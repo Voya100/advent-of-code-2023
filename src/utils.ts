@@ -1,44 +1,30 @@
-export function sum<T>(
-  objects: T[],
-  valueFunction: (object: T, index?: number) => number
-): number {
-  return objects.reduce(
-    (sum, object, index) => sum + valueFunction(object, index),
-    0
-  );
+export function sum<T>(objects: T[], valueFunction: (object: T, index?: number) => number): number {
+  return objects.reduce((sum, object, index) => sum + valueFunction(object, index), 0);
 }
 
 export function numberSum(numbers: number[]) {
   return numbers.reduce((sum, object) => sum + object, 0);
 }
 
-export function multiply<T>(
-  objects: T[],
-  valueFunction: (object: T) => number
-) {
+export function multiply<T>(objects: T[], valueFunction: (object: T) => number) {
   return objects.reduce((result, object) => result * valueFunction(object), 1);
 }
 
 export function min<T>(objects: T[], valueFunction: (object: T) => number) {
   return objects.reduce(
-    (minObject, object) =>
-      valueFunction(minObject) <= valueFunction(object) ? minObject : object,
+    (minObject, object) => (valueFunction(minObject) <= valueFunction(object) ? minObject : object),
     objects[0]
   );
 }
 
 export function max<T>(objects: T[], valueFunction: (object: T) => number) {
   return objects.reduce(
-    (maxObject, object) =>
-      valueFunction(maxObject) >= valueFunction(object) ? maxObject : object,
+    (maxObject, object) => (valueFunction(maxObject) >= valueFunction(object) ? maxObject : object),
     objects[0]
   );
 }
 
-export function toMap<T, IdType>(
-  values: T[],
-  idFunction: (value: T) => IdType
-) {
+export function toMap<T, IdType>(values: T[], idFunction: (value: T) => IdType) {
   const map = new Map<IdType, T>();
   for (const value of values) {
     map.set(idFunction(value), value);
@@ -46,10 +32,7 @@ export function toMap<T, IdType>(
   return map;
 }
 
-export function toRecord<T, IdType extends number | string>(
-  values: T[],
-  idFunction: (value: T) => IdType
-) {
+export function toRecord<T, IdType extends number | string>(values: T[], idFunction: (value: T) => IdType) {
   const map = {} as Record<IdType, T>;
   for (const value of values) {
     map[idFunction(value)] = value;
@@ -99,9 +82,7 @@ export function getCombinations<T>(values: T[]): T[][] {
     return [values];
   }
   const subCombinations = getCombinations(values.slice(1));
-  subCombinations.push(
-    ...subCombinations.map((subCombination) => [values[0], ...subCombination])
-  );
+  subCombinations.push(...subCombinations.map((subCombination) => [values[0], ...subCombination]));
   subCombinations.push([values[0]]);
 
   return subCombinations;
@@ -134,20 +115,11 @@ export function getAllArrayPairs<T>(values: T[]): [T[], T[]][] {
  * @param minPatternCount How often pattern must occur sequentially
  * @returns
  */
-export function findPattern(
-  values: number[],
-  minLength = 250,
-  maxLength = 2500,
-  minPatternCount = 10
-) {
+export function findPattern(values: number[], minLength = 250, maxLength = 2500, minPatternCount = 10) {
   if (values.length < maxLength * (minPatternCount + 1)) {
     return;
   }
-  for (
-    let patternLength = minLength;
-    patternLength <= maxLength;
-    patternLength++
-  ) {
+  for (let patternLength = minLength; patternLength <= maxLength; patternLength++) {
     const patternResult = hasPattern(values, patternLength, minPatternCount);
     if (patternResult) {
       return patternResult;
@@ -156,11 +128,7 @@ export function findPattern(
   return null;
 }
 
-function hasPattern(
-  values: number[],
-  patternLength: number,
-  patternCount: number
-) {
+function hasPattern(values: number[], patternLength: number, patternCount: number) {
   const start = values.length - patternLength * patternCount;
   for (let i = 0; i < patternLength; i++) {
     let previousValue = values[start + i];
