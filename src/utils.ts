@@ -109,7 +109,7 @@ export function getAllArrayPairs<T>(values: T[]): [T[], T[]][] {
  * patterns, it is a pattern.
  * Example pattern of length 3: 1,3,6,  7,9,12  13,15,18
  * (13-7=7-1, 15-9=9-3, 18-12=12-6)
- * @param values          Number values from whih to find the pattern
+ * @param values          Number values from which to find the pattern
  * @param minLength       Minimum length of pattern
  * @param maxLength       Maximum length of pattern
  * @param minPatternCount How often pattern must occur sequentially
