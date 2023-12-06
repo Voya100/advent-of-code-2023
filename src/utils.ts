@@ -146,3 +146,10 @@ function hasPattern(values: number[], patternLength: number, patternCount: numbe
   }
   return { patternLength };
 }
+
+/**
+ * Finds all integer values within string, accepting all non-digit value separators
+ */
+export function parseNumbers(input: string) {
+  return [...input.matchAll(/\d+/g)].map((v) => +v);
+}
