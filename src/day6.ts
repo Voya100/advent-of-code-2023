@@ -4,7 +4,7 @@ import { multiply, parseNumbers } from './utils';
 
 type Race = {
   time: number;
-  distance: number;
+  distanceRecord: number;
 };
 
 export function part1(input: string) {
@@ -22,26 +22,30 @@ function parseInput(input: string): Race[] {
   const [timeInput, distanceInput] = input.split('\n');
   const times = parseNumbers(timeInput);
   const distances = parseNumbers(distanceInput);
-  return times.map((time, i) => ({ time, distance: distances[i] }));
+  return times.map((time, i) => ({ time, distanceRecord: distances[i] }));
 }
 
 function getWaysToBeat(race: Race) {
-  const { min, max } = getMinAndMax(race);
+  const { min, max } = getMinAndMaxButtonDuration(race);
   return max - min + 1;
 }
 
-// While unoptimised, still runs within 200 ms for given input
-function getMinAndMax(race: Race) {
-  let min = Infinity;
-  let max = -Infinity;
-  for (let i = 0; i < race.time; i++) {
-    const distaneTravelled = (race.time - i) * i;
-    if (distaneTravelled > race.distance) {
-      if (min === Infinity) {
-        min = i;
-      }
-      max = i;
-    }
+/**
+ * Finds minimum and maximum duration to press the button by solving the quadratic equation
+ * v*t1 > d // v = speed = time to press the button, d = minDistance, t1 = time remaining after button press
+ * => v*(t-v) > d // t = total time
+ * => -v**2 + v*t - d > 0 // Solve the quadratic equation
+ */
+function getMinAndMaxButtonDuration(race: Race) {
+  let min = (race.time - Math.sqrt(race.time ** 2 - 4 * race.distanceRecord)) / 2;
+  let max = (race.time + Math.sqrt(race.time ** 2 - 4 * race.distanceRecord)) / 2;
+  // Must be better than record, so increment/decrement if exact match
+  if (min === Math.ceil(min)) {
+    min++;
   }
-  return { min, max };
+  if (max === Math.floor(max)) {
+    max--;
+  }
+  // Only complete milliseconds
+  return { min: Math.ceil(min), max: Math.floor(max) };
 }
