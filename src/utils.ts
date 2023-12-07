@@ -1,4 +1,4 @@
-export function sum<T>(objects: T[], valueFunction: (object: T, index?: number) => number): number {
+export function sum<T>(objects: T[], valueFunction: (object: T, index: number) => number): number {
   return objects.reduce((sum, object, index) => sum + valueFunction(object, index), 0);
 }
 
@@ -6,8 +6,8 @@ export function numberSum(numbers: number[]) {
   return numbers.reduce((sum, object) => sum + object, 0);
 }
 
-export function multiply<T>(objects: T[], valueFunction: (object: T) => number) {
-  return objects.reduce((result, object) => result * valueFunction(object), 1);
+export function multiply<T>(objects: T[], valueFunction: (object: T, index: number) => number) {
+  return objects.reduce((result, object, i) => result * valueFunction(object, i), 1);
 }
 
 export function min<T>(objects: T[], valueFunction: (object: T) => number) {
