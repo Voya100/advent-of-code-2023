@@ -115,12 +115,12 @@ export function getAllArrayPairs<T>(values: T[]): [T[], T[]][] {
  * @param minPatternCount How often pattern must occur sequentially
  * @returns
  */
-export function findPattern(values: number[], minLength = 250, maxLength = 2500, minPatternCount = 10) {
+export function findIncreasingPattern(values: number[], minLength = 250, maxLength = 2500, minPatternCount = 10) {
   if (values.length < maxLength * (minPatternCount + 1)) {
     return;
   }
   for (let patternLength = minLength; patternLength <= maxLength; patternLength++) {
-    const patternResult = hasPattern(values, patternLength, minPatternCount);
+    const patternResult = hasIncreasingPattern(values, patternLength, minPatternCount);
     if (patternResult) {
       return patternResult;
     }
@@ -128,7 +128,7 @@ export function findPattern(values: number[], minLength = 250, maxLength = 2500,
   return null;
 }
 
-function hasPattern(values: number[], patternLength: number, patternCount: number) {
+function hasIncreasingPattern(values: number[], patternLength: number, patternCount: number) {
   const start = values.length - patternLength * patternCount;
   for (let i = 0; i < patternLength; i++) {
     let previousValue = values[start + i];
@@ -147,9 +147,87 @@ function hasPattern(values: number[], patternLength: number, patternCount: numbe
   return { patternLength };
 }
 
+export function findPattern<T>(values: T[], minLength = 250, maxLength = 2500, minPatternCount = 10) {
+  if (values.length < maxLength * (minPatternCount + 1)) {
+    console.log(values.length, maxLength * (minPatternCount + 1));
+    return;
+  }
+  for (let patternLength = minLength; patternLength <= maxLength; patternLength++) {
+    const patternResult = hasPattern(values, patternLength, minPatternCount);
+    if (patternResult) {
+      return patternResult;
+    }
+  }
+  return null;
+}
+
+function hasPattern<T>(values: T[], patternLength: number, patternCount: number) {
+  const start = values.length - patternLength * patternCount;
+  for (let i = 0; i < patternLength; i++) {
+    let previousValue = values[start + i];
+    for (let patternIndex = 1; patternIndex < patternCount; patternIndex++) {
+      const patternValue = values[start + i + patternIndex * patternLength];
+      if (previousValue !== patternValue) {
+        return null;
+      }
+      previousValue = patternValue;
+    }
+  }
+  return { patternLength };
+}
+
 /**
  * Finds all integer values within string, accepting all non-digit value separators
  */
 export function parseNumbers(input: string) {
   return [...input.matchAll(/\d+/g)].map((v) => +v);
+}
+
+export function findLeastCommonMultiple(numbers: number[]) {
+  let leastCommonMultiple = numbers[0];
+  for (const number of numbers.slice(1)) {
+    leastCommonMultiple =
+      Math.abs(number * leastCommonMultiple) / findGreatestCommonDivisor(number, leastCommonMultiple);
+  }
+  return leastCommonMultiple;
+}
+
+export function findGreatestCommonDivisor(number1: number, number2: number) {
+  if (number2 === 0) {
+    return number1;
+  }
+  return findGreatestCommonDivisor(number2, number1 % number2);
+}
+
+export function getDivisors(number: number) {
+  const primes = getPrimes(number);
+  const divisors: number[] = [];
+  let dividedNumber = number;
+  while (dividedNumber > 1) {
+    for (const prime of primes) {
+      if (dividedNumber % prime === 0) {
+        dividedNumber /= prime;
+        divisors.push(prime);
+        break;
+      }
+    }
+  }
+  return divisors;
+}
+
+export function getPrimes(maxNumber: number) {
+  const primes = [2];
+  for (let i = 3; i <= maxNumber; i++) {
+    let isPrime = true;
+    for (const prime of primes) {
+      if (i % prime === 0) {
+        isPrime = false;
+        break;
+      }
+    }
+    if (isPrime) {
+      primes.push(i);
+    }
+  }
+  return primes;
 }
