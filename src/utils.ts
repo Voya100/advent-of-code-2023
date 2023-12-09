@@ -180,7 +180,7 @@ function hasPattern<T>(values: T[], patternLength: number, patternCount: number)
  * Finds all integer values within string, accepting all non-digit value separators
  */
 export function parseNumbers(input: string) {
-  return [...input.matchAll(/\d+/g)].map((v) => +v);
+  return [...input.matchAll(/-?\d+/g)].map((v) => +v);
 }
 
 export function findLeastCommonMultiple(numbers: number[]) {
