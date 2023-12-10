@@ -231,3 +231,33 @@ export function getPrimes(maxNumber: number) {
   }
   return primes;
 }
+
+export type Coordinate = { x: number; y: number };
+
+export function getAdjacentNonDiagonalCoordinates({ x, y }: Coordinate) {
+  return [
+    { x: x, y: y - 1 },
+    { x: x - 1, y: y },
+    { x: x, y: y + 1 },
+    { x: x + 1, y: y },
+  ];
+}
+export function getAdjacentCoordinates({ x, y }: Coordinate) {
+  return [
+    // Top row
+    { x: x - 1, y: y - 1 },
+    { x: x, y: y - 1 },
+    { x: x + 1, y: y - 1 },
+    // Same row
+    { x: x - 1, y: y },
+    { x: x + 1, y: y },
+    // Bottom row
+    { x: x - 1, y: y + 1 },
+    { x: x, y: y + 1 },
+    { x: x + 1, y: y + 1 },
+  ];
+}
+
+export function isNotNullish<T>(value: T | null | undefined): value is T {
+  return value != null;
+}
