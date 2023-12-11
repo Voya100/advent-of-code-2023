@@ -60,6 +60,9 @@ export function median(values: number[]) {
   return values[Math.floor(values.length / 2)];
 }
 
+/**
+ * Return numbers range [start, end)
+ */
 export function getRange(start: number, end: number) {
   const numbers: number[] = [];
   for (let i = start; i < end; i++) {
@@ -86,6 +89,21 @@ export function getCombinations<T>(values: T[]): T[][] {
   subCombinations.push([values[0]]);
 
   return subCombinations;
+}
+
+/**
+ * Returns all pair combinations of values
+ * E.g. [1,2,3] => [[1,2],[1,3],[2,3]]
+ */
+export function getAllPairs<T>(values: T[], startIndex = 0, output: [T, T][] = []): [T, T][] {
+  if (values.length <= startIndex) {
+    return output;
+  }
+  const item = values[startIndex];
+  for (let i = startIndex + 1; i < values.length; i++) {
+    output.push([item, values[i]]);
+  }
+  return getAllPairs(values, startIndex + 1, output);
 }
 
 /**
