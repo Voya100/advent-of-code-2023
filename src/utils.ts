@@ -166,10 +166,6 @@ function hasIncreasingPattern(values: number[], patternLength: number, patternCo
 }
 
 export function findPattern<T>(values: T[], minLength = 250, maxLength = 2500, minPatternCount = 10) {
-  if (values.length < maxLength * (minPatternCount + 1)) {
-    console.log(values.length, maxLength * (minPatternCount + 1));
-    return;
-  }
   for (let patternLength = minLength; patternLength <= maxLength; patternLength++) {
     const patternResult = hasPattern(values, patternLength, minPatternCount);
     if (patternResult) {
@@ -278,4 +274,40 @@ export function getAdjacentCoordinates({ x, y }: Coordinate) {
 
 export function isNotNullish<T>(value: T | null | undefined): value is T {
   return value != null;
+}
+
+/**
+ * Iterates between numbers start -> end, not including the end
+ * End can be lower value than start.
+ */
+export class NumberIterator {
+  constructor(
+    private start: number,
+    private end: number
+  ) {}
+
+  *[Symbol.iterator]() {
+    if (this.start < this.end) {
+      let value = this.start;
+      while (value < this.end) {
+        yield value;
+        value++;
+      }
+    }
+    if (this.start > this.end) {
+      let value = this.start;
+      while (value > this.end) {
+        yield value;
+        value--;
+      }
+    }
+  }
+
+  copy() {
+    return new NumberIterator(this.start, this.end);
+  }
+
+  reverse() {
+    return new NumberIterator(this.end - 1, this.start - 1);
+  }
 }
