@@ -1,3 +1,5 @@
+import { GraphNode } from './graph-node';
+
 export function findCycleLength<ValueType, Options, NodeType extends DfsNode<ValueType, Options>>(
   start: NodeType,
   options: Options
@@ -83,7 +85,7 @@ export function findTargetsWithDfs<NodeType extends DfsNode<unknown, Options>, O
 /**
  * Generic node type for depth-first search (DFS)
  */
-export abstract class DfsNode<ValueType, Options> {
+export abstract class DfsNode<ValueType, Options> extends GraphNode<DfsNode<ValueType, Options>> {
   value!: ValueType;
 
   nodeState = {
@@ -92,34 +94,6 @@ export abstract class DfsNode<ValueType, Options> {
   };
 
   abstract getAdjacentNodes(options: Options): DfsNode<ValueType, Options>[];
-
-  getDistanceToStart(): number {
-    let distance = 0;
-    let previousNode = this.nodeState.previousNode;
-    while (previousNode) {
-      distance++;
-      previousNode = previousNode.previousNode;
-    }
-    return distance;
-  }
-
-  getPath<NodeType extends DfsNode<ValueType, Options>>(): NodeType[] {
-    const path: NodeType[] = [this as unknown as NodeType];
-    let previousNode = this.previousNode;
-    while (previousNode) {
-      path.push(previousNode as NodeType);
-      previousNode = previousNode.previousNode;
-    }
-    return path;
-  }
-
-  get startNode(): DfsNode<ValueType, Options> {
-    return (this.nodeState.previousNode && this.nodeState.previousNode.startNode) || this;
-  }
-
-  get previousNode() {
-    return this.nodeState.previousNode;
-  }
 
   resetNodeState() {
     this.nodeState = {

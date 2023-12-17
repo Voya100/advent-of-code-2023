@@ -1,3 +1,5 @@
+import { GraphNode } from './graph-node';
+
 /**
  * Generic bredth-first seach implementation
  * @param start        Start node
@@ -60,7 +62,7 @@ export function findTargetsWithBfs<ValueType, Options, NodeType extends BfsNode<
 /**
  * Generic node type for breadth-first search (BFS)
  */
-export abstract class BfsNode<ValueType, Options> {
+export abstract class BfsNode<ValueType, Options> extends GraphNode<BfsNode<ValueType, Options>> {
   value!: ValueType;
 
   nodeState = {
@@ -75,24 +77,6 @@ export abstract class BfsNode<ValueType, Options> {
       return this.nodeState.previousNode.getDistanceToStart() + 1;
     }
     return 0;
-  }
-
-  getPath<NodeType extends BfsNode<ValueType, Options>>(): NodeType[] {
-    const path: NodeType[] = [this as unknown as NodeType];
-    let previousNode = this.previousNode;
-    while (previousNode) {
-      path.push(previousNode as NodeType);
-      previousNode = previousNode.previousNode;
-    }
-    return path;
-  }
-
-  get startNode(): BfsNode<ValueType, Options> {
-    return (this.nodeState.previousNode && this.nodeState.previousNode.startNode) || this;
-  }
-
-  get previousNode() {
-    return this.nodeState.previousNode;
   }
 
   resetNodeState() {
