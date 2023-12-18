@@ -1,60 +1,73 @@
 // https://adventofcode.com/2023/day/18
 
-import { getRange } from './utils';
+import { Coordinate, sum } from './utils';
 
 type PlanItem = {
   direction: string;
   distance: number;
-  edge: string;
 };
 
-type GridValue = {
-  edge: boolean;
-  trench: boolean;
+type Hole = {
+  start: Coordinate;
+  end: Coordinate;
 };
 
 export function part1(input: string) {
-  const plans = parseInput(input);
-  const grid = dig(plans);
-  fillGrid(grid);
-  return grid.flatMap((row) => row).filter((v) => v.edge || v.trench).length;
+  const plans = parseInput(input, false);
+  const holes = getHoles(plans);
+  return countHoleSize(holes);
 }
 
 export function part2(input: string) {
-  const v = parseInput(input);
-  return '';
+  const plans = parseInput(input, true);
+  const holes = getHoles(plans);
+  return countHoleSize(holes);
 }
 
-function parseInput(input: string) {
-  return input.split('\n').map(parsePlanItem);
+function parseInput(input: string, useHex: boolean) {
+  return input.split('\n').map((i) => parsePlanItem(i, useHex));
 }
 
-function parsePlanItem(row: string) {
-  const [direction, distance, edge] = row.replaceAll(/[()]/g, '').split(' ');
+function parsePlanItem(row: string, useHex: boolean) {
+  const [direction, distance, hex] = row.replaceAll(/[()#]/g, '').split(' ');
+  if (useHex) {
+    const hexDistance = Number.parseInt(hex.slice(0, 5), 16);
+    const directions = 'RDLU';
+    return {
+      distance: hexDistance,
+      direction: directions[+hex[5]],
+    };
+  }
   return {
     direction,
     distance: +distance,
-    edge,
   };
 }
 
-function dig(plans: PlanItem[]) {
+function getHoles(plans: PlanItem[]) {
+  // Change coordinates to start from 0
   const width = getMinMaxIndices(plans, 'R', 'L');
   const height = getMinMaxIndices(plans, 'D', 'U');
-  const grid: GridValue[][] = getRange(0, Math.abs(height.minIndex) + height.maxIndex + 1).map(() =>
-    getRange(0, Math.abs(width.minIndex) + width.maxIndex + 1).map(() => ({ edge: false, trench: false }))
-  );
+  const holes: Hole[] = [];
+  // Give correct offset, since 0,0 isn't necessarly the starting point
   let x = -width.minIndex;
   let y = -height.minIndex;
   for (const plan of plans) {
     const { xDir, yDir } = getDirection(plan.direction);
-    for (let i = 0; i < plan.distance; i++) {
-      x += xDir;
-      y += yDir;
-      grid[y][x] = { edge: true, trench: false };
+    const start = { x, y };
+    x += xDir * plan.distance;
+    y += yDir * plan.distance;
+    const end = {
+      x,
+      y,
+    };
+    if (start.x < end.x || start.y < end.y) {
+      holes.push({ start, end });
+    } else {
+      holes.push({ start: end, end: start });
     }
   }
-  return grid;
+  return holes;
 }
 
 function getMinMaxIndices(plans: PlanItem[], increaseDirection: string, decreaseDirection: string) {
@@ -91,34 +104,91 @@ function getDirection(direction: string) {
   throw new Error(`Invalid direction: ${direction}`);
 }
 
-function fillGrid(grid: GridValue[][]) {
-  for (let j = 0; j < grid.length; j++) {
+function countHoleSize(holes: Hole[]) {
+  const maxY = Math.max(...holes.flatMap((hole) => [hole.start.y, hole.end.y]));
+  const maxX = Math.max(...holes.flatMap((hole) => [hole.start.x, hole.end.x]));
+  // Get all corner positions and indices next to them, since values between corners behave differently
+  const distinctY = [
+    ...new Set(
+      holes
+        .flatMap((hole) => [
+          hole.start.y - 1,
+          hole.start.y,
+          hole.start.y + 1,
+          hole.end.y - 1,
+          hole.end.y,
+          hole.end.y + 1,
+        ])
+        .filter((y) => y >= 0 && y <= maxY)
+    ),
+  ];
+  distinctY.sort((a, b) => a - b);
+  distinctY.push(maxY + 1);
+
+  const distinctX = [
+    ...new Set(
+      holes
+        .flatMap((hole) => [
+          hole.start.x - 1,
+          hole.start.x,
+          hole.start.x + 1,
+          hole.end.x - 1,
+          hole.end.x,
+          hole.end.x + 1,
+        ])
+        .filter((x) => x >= 0 && x <= maxX)
+    ),
+  ];
+  distinctX.sort((a, b) => a - b);
+  distinctX.push(maxX + 1);
+  let holeSize = 0;
+  // Go through all x/y combinations
+  for (let j = 0; j < distinctY.length - 1; j++) {
+    const startY = distinctY[j];
+    const endY = distinctY[j + 1];
+    const height = endY - startY;
     let insideTrench = false;
-    let sectionsInTrench = [];
-    for (let i = 0; i < grid[0].length; i++) {
-      const edge = grid[j][i].edge;
-
-      if (!edge && insideTrench) {
-        sectionsInTrench.push(grid[j][i]);
+    let trenchSize = 0;
+    for (let i = 0; i < distinctX.length - 1; i++) {
+      const startX = distinctX[i];
+      const endX = distinctX[i + 1];
+      const width = endX - startX;
+      const start = { x: startX, y: startY };
+      const end = { x: endX, y: endY };
+      if (!isWall(holes, start.x, start.y) && insideTrench) {
+        trenchSize += height * width;
       }
-
-      if (isVerticalWall(grid, i, j) || isDownCorner(grid, i, j)) {
+      if (isVerticalWall(holes, start, end) || isTopCorner(holes, start, end)) {
         insideTrench = !insideTrench;
         if (!insideTrench) {
-          for (const section of sectionsInTrench) {
-            section.trench = true;
-            sectionsInTrench = [];
-          }
+          holeSize += trenchSize;
+          trenchSize = 0;
         }
       }
     }
   }
+  const wallSizes = sum(holes, (hole) => hole.end.x - hole.start.x + (hole.end.y - hole.start.y));
+  return holeSize + wallSizes;
 }
 
-function isVerticalWall(grid: GridValue[][], x: number, y: number) {
-  return grid[y][x].edge && grid[y + 1]?.[x].edge && grid[y - 1]?.[x].edge;
+function isWall(holes: Hole[], x: number, y: number) {
+  return holes.some((hole) => hole.start.x <= x && x <= hole.end.x && hole.start.y <= y && y <= hole.end.y);
 }
 
-function isDownCorner(grid: GridValue[][], x: number, y: number) {
-  return grid[y][x].edge && grid[y + 1]?.[x].edge && (grid[y][x + 1]?.edge || grid[y][x - 1]?.edge);
+/**
+ * Wall above and below
+ */
+function isVerticalWall(holes: Hole[], start: Coordinate, end: Coordinate) {
+  return isWall(holes, start.x, start.y) && isWall(holes, start.x, start.y - 1) && isWall(holes, start.x, end.y);
+}
+
+/**
+ * Wall below and either left or right side
+ */
+function isTopCorner(holes: Hole[], start: Coordinate, end: Coordinate) {
+  return (
+    isWall(holes, start.x, start.y) &&
+    isWall(holes, start.x, end.y) &&
+    (isWall(holes, start.x + 1, start.y) || isWall(holes, start.x - 1, start.y))
+  );
 }
