@@ -27,6 +27,9 @@ export class ExtendedSet<T> extends Set<T> {
     return newSet;
   }
 
+  /**
+   * Removes values of iterable from set
+   */
   difference(iterable: Iterable<T>) {
     const newSet = new ExtendedSet(this);
     for (const value of iterable) {
