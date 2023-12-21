@@ -7,7 +7,7 @@ import { GraphNode } from './graph-node';
  * @param options      Options which may be passed to node's getAdjacentNodes method
  * @returns
  */
-export function findTargetWithBfs<ValueType, Options, NodeType extends BfsNode<ValueType, Options>>(
+export function findTargetWithBfs<NodeType extends BfsNode<NodeType, Options>, Options>(
   start: NodeType,
   isTargetNode: (node: NodeType) => boolean,
   options: Options
@@ -26,7 +26,7 @@ export function findTargetWithBfs<ValueType, Options, NodeType extends BfsNode<V
  * @param options      Options which may be passed to node's getAdjacentNodes method
  * @returns
  */
-export function findTargetsWithBfs<ValueType, Options, NodeType extends BfsNode<ValueType, Options>>(
+export function findTargetsWithBfs<NodeType extends BfsNode<NodeType, Options>, Options>(
   start: NodeType,
   isTargetNode: (node: NodeType) => boolean,
   options: Options,
@@ -62,15 +62,13 @@ export function findTargetsWithBfs<ValueType, Options, NodeType extends BfsNode<
 /**
  * Generic node type for breadth-first search (BFS)
  */
-export abstract class BfsNode<ValueType, Options> extends GraphNode<BfsNode<ValueType, Options>> {
-  value!: ValueType;
-
+export abstract class BfsNode<NodeType extends BfsNode<NodeType, Options>, Options> extends GraphNode<NodeType> {
   nodeState = {
     checked: false,
-    previousNode: undefined as BfsNode<ValueType, Options> | undefined,
+    previousNode: undefined as NodeType | undefined,
   };
 
-  abstract getAdjacentNodes(options: Options): BfsNode<ValueType, Options>[];
+  abstract getAdjacentNodes(options: Options): NodeType[];
 
   getDistanceToStart(): number {
     if (this.nodeState.previousNode) {
