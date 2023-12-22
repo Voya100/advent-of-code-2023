@@ -311,3 +311,7 @@ export class NumberIterator {
     return new NumberIterator(this.end - 1, this.start - 1);
   }
 }
+
+export function deepClone<T>(object: T): T {
+  return JSON.parse(JSON.stringify(object));
+}
