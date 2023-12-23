@@ -70,16 +70,15 @@ function getTiles(rows: string[][], cyclePipes: Pipe[]) {
 /**
  * Pipe node. Connects only to other pipes based on pipe's direction.
  */
-class Pipe extends DfsNode<string, undefined> {
+class Pipe extends DfsNode<Pipe, undefined> {
   neighbors: Pipe[] = [];
 
   constructor(
-    symbol: string,
+    public value: string,
     public x: number,
     public y: number
   ) {
     super();
-    this.value = symbol;
   }
 
   override getAdjacentNodes(): Pipe[] {
@@ -139,18 +138,17 @@ class Pipe extends DfsNode<string, undefined> {
  * Tile node, which can be any tile in the map (including pipe).
  * Allows movement to all non-diagonal directions, even if is a pipe
  */
-class Tile extends DfsNode<string, undefined> {
+class Tile extends DfsNode<Tile, undefined> {
   neighbors: Tile[] = [];
 
   coordinateString: string;
 
   constructor(
-    symbol: string,
+    public value: string,
     public x: number,
     public y: number
   ) {
     super();
-    this.value = symbol;
     this.coordinateString = `${x},${y}`;
   }
 

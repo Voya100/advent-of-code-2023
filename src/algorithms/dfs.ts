@@ -1,6 +1,7 @@
+import { sum } from '../utils';
 import { GraphNode } from './graph-node';
 
-export function findCycleLength<ValueType, Options, NodeType extends DfsNode<ValueType, Options>>(
+export function findCycleLength<NodeType extends DfsNode<NodeType, Options>, Options>(
   start: NodeType,
   options: Options
 ) {
@@ -8,7 +9,7 @@ export function findCycleLength<ValueType, Options, NodeType extends DfsNode<Val
   return lastNodeInCycle.getDistanceToStart() + 1;
 }
 
-export function findLastNodeInCycle<ValueType, Options, NodeType extends DfsNode<ValueType, Options>>(
+export function findLastNodeInCycle<NodeType extends DfsNode<NodeType, Options>, Options>(
   start: NodeType,
   options: Options
 ) {
@@ -26,7 +27,7 @@ export function findLastNodeInCycle<ValueType, Options, NodeType extends DfsNode
  * @param options      Options which may be passed to node's getAdjacentNodes method
  * @returns
  */
-export function findTargetWithDfs<NodeType extends DfsNode<unknown, Options>, Options>(
+export function findTargetWithDfs<NodeType extends DfsNode<NodeType, Options>, Options>(
   start: NodeType,
   isTargetNode: (node: NodeType) => boolean,
   options: Options
@@ -46,7 +47,7 @@ export function findTargetWithDfs<NodeType extends DfsNode<unknown, Options>, Op
  * @param options      Options which may be passed to node's getAdjacentNodes method
  * @returns
  */
-export function findTargetsWithDfs<NodeType extends DfsNode<unknown, Options>, Options>(
+export function findTargetsWithDfs<NodeType extends DfsNode<NodeType, Options>, Options>(
   start: NodeType,
   isTargetNode: (node: NodeType) => boolean,
   options: Options,
@@ -83,17 +84,75 @@ export function findTargetsWithDfs<NodeType extends DfsNode<unknown, Options>, O
 }
 
 /**
+ * Finds longest path to target with DFS and returns its length
+ */
+export function findLongestPathLengthWithDfs<NodeType extends DfsNode<NodeType, Options>, Options>(
+  start: NodeType,
+  isTargetNode: (node: NodeType) => boolean,
+  getWeight: (node: NodeType) => number,
+  options: Options
+) {
+  const path = [start];
+  const pathSet = new Set([start]);
+  let longestPath = 0;
+  const nextNodes: [NodeType, NodeType][] = start.getAdjacentNodes(options).map((node) => [start, node]);
+
+  while (nextNodes.length) {
+    const [previousNode, currentNode] = nextNodes.pop()!;
+    if (path[path.length - 1] !== previousNode) {
+      while (path[path.length - 1] !== previousNode) {
+        pathSet.delete(path.pop()!);
+      }
+    }
+    path.push(currentNode);
+    pathSet.add(currentNode);
+    if (isTargetNode(currentNode)) {
+      const pathLength = sum(path, getWeight) - 1;
+      longestPath = Math.max(longestPath, pathLength);
+    }
+
+    for (const node of currentNode.getAdjacentNodes(options)) {
+      if (!pathSet.has(node)) {
+        nextNodes.push([currentNode, node]);
+      }
+    }
+  }
+  return longestPath;
+}
+
+/*export function findAllPathsWithDfs<NodeType extends DfsNode<NodeType, Options>, Options>(
+  path: NodeType[],
+  isTargetNode: (node: NodeType) => boolean,
+  options: Options,
+  paths: NodeType[][] = []
+) {
+  const currentNode = path[path.length - 1];
+
+  if (isTargetNode(currentNode)) {
+    paths.push([...path]);
+    return paths;
+  }
+
+  for (const node of currentNode.getAdjacentNodes(options)) {
+    if (!path.includes(node)) {
+      path.push(node);
+    }
+    findAllPathsWithDfs(path, isTargetNode, options, paths);
+    path.pop();
+  }
+  return paths;
+}*/
+
+/**
  * Generic node type for depth-first search (DFS)
  */
-export abstract class DfsNode<ValueType, Options> extends GraphNode<DfsNode<ValueType, Options>> {
-  value!: ValueType;
-
+export abstract class DfsNode<NodeType extends DfsNode<NodeType, Options>, Options> extends GraphNode<NodeType> {
   nodeState = {
     checked: false,
-    previousNode: undefined as DfsNode<ValueType, Options> | undefined,
+    previousNode: undefined as NodeType | undefined,
   };
 
-  abstract getAdjacentNodes(options: Options): DfsNode<ValueType, Options>[];
+  abstract getAdjacentNodes(options: Options): NodeType[];
 
   resetNodeState() {
     this.nodeState = {

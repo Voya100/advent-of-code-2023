@@ -27,6 +27,19 @@ export abstract class GraphNode<NodeType extends GraphNode<NodeType>> {
     return path;
   }
 
+  pathIncludesNode(node: NodeType) {
+    if ((this as unknown as NodeType) === node) {
+      return true;
+    }
+    let previousNode = this.previousNode;
+    while (previousNode) {
+      if (previousNode === node) {
+        return true;
+      }
+      previousNode = previousNode.previousNode;
+    }
+  }
+
   get startNode(): NodeType {
     return (this.nodeState.previousNode && this.nodeState.previousNode.startNode) || (this as unknown as NodeType);
   }
